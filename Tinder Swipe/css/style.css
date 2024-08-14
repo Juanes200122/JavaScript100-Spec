@@ -1,0 +1,227 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    display: grid;
+    place-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+    user-select: none;
+    background: #efefef;
+
+}
+main {
+    background-image: url(../iphone.webp);
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 320px;
+    height: 640px;
+    display: flex;
+    filter: drop-shadow(0 0 20px #0000004d);
+}
+section {
+    background-color: #f6f6f6;
+    width: 100%;
+    border-radius:  32px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    padding: 16px 6px;
+    margin: 24px;
+    gap: 24px;
+}
+
+header {
+    display: flex;
+    justify-content: center;
+    position: relative;
+
+    &::after {
+        content: '';
+        width: 120px;
+        height: 15px;
+        background-color: rgb(0, 0, 0);
+        position: absolute;
+        top: -20px;
+        border-radius: 0px 0px 10px 10px;
+    }
+
+    & img {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+footer {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    padding: 0 24px;
+    justify-content: center;
+    align-items: center;
+
+    & button {
+        background-image: url(../tinder-icons.webp);
+        background-repeat: no-repeat;
+        background-position: 0px 0px;
+        background-size: 175px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        border: 0;
+        transition: scale .3s ease ;
+
+        &:hover {
+            scale: 1.3;
+        }
+        &.is-big {
+            background-size: 250px;
+            width: 48px;
+            height: 48px;
+        }
+        &.is-undo {
+            background-position: -140px;
+        }
+        &.is-remove {
+            background-position: -150px;
+        }
+        &.is-fav {
+            background-position: -50px;
+        }
+        &.is-star {
+            background-position: -70px;
+        }
+    }
+}
+
+
+.cards {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+
+    & article  {
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.049);
+        cursor: grab;
+        inset: 0;
+        overflow: hidden;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        z-index: 2;
+        box-sizing: border-box;
+
+    
+        &.go-left {
+            transform: translateX(-200%) rotate(-30deg) !important;
+        }
+
+        &.go-right {
+            transform: translateX(200%) rotate(30deg) !important;
+        }
+
+        &.go-left , &.go-right {
+            transition: transform .3s ease, rotate .3s ease;
+        }
+        &.reset {
+            transition: transform .3s ease;
+            transform: translate(0) !important;
+        }
+
+
+
+        & .choice {
+            border-radius: 8px;
+            color: black;
+            border: 4px solid;
+            z-index: 9999;
+            position: absolute;
+            top: 32px;
+            right: 16px;
+            padding: 4px 8px;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 0, 0, .3);
+            opacity: 0;
+
+            &.nope {
+                border-color:  #ff6e63;
+                color: #ff6e63;
+                transform: rotate(30deg);
+            }
+
+            &.like {
+                border-color:  #70ff75;
+                color: #70ff75;
+                transform: rotate(-30deg);
+                left: 16px;
+                width: fit-content;
+            }
+        }
+    }
+
+
+    & img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+
+
+    & h2 {
+        position: absolute;
+        inset: 0;
+        height: 100%;
+        width: 100%;
+        padding: 25px 16px;
+        z-index: 3;
+        background: linear-gradient(to top, #000000b3 20%, transparent 40%);
+        display: flex;
+        align-items: flex-end;
+        color: white;
+        & .upper_perfil {
+            height: 20px;
+            display: flex;
+            justify-content:  end;
+            right: 0;
+            position: absolute;
+            margin-right: 16px;
+            padding: 8px;
+            border-radius: 50%;    
+            align-items: center;
+            z-index: 55;            
+        }
+    }
+
+    & h3 {
+        position: absolute;
+        inset: 0;
+        height: 100%;
+        width: 100%;
+        padding: 8px 16px;
+        z-index: 3;
+        display: flex;
+        align-items: flex-end;
+        color: white;
+        font-size: 12px;
+        font-weight: normal;
+        & svg {
+            margin-right: 5px;
+        }
+    }
+    & span {
+        margin-left: 4px;
+        font-size: 18px;
+        line-height: 1.4;
+        font-weight: 400;
+    }
+}
