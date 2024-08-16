@@ -21,7 +21,6 @@ main {
     height: 640px;
     display: flex;
     filter: drop-shadow(0 0 20px #0000004d);
-    zoom: 0.8;
 }
 section {
     background-color: #f6f6f6;
