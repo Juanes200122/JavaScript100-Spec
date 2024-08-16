@@ -15,6 +15,7 @@ const $restartButton = document.querySelector('#restart-button');
 canvas.width = 448;
 canvas.height = 400;
 
+let score = 0;
 const PADDLE_sensitivity = 4;
 const ballRadius = 3;
 let x, y, dx, dy;
@@ -27,15 +28,37 @@ const brickWidth = 32;
 const brickHeight = 16;
 const brickOffsetTop = 80;
 const brickOffsetLeft = 17;
-const bricksLayout = [
-    [1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1],
-    [1, 1, 0, 0, 1, 4, 2, 4, 1, 0, 0, 1, 1],
-    [1, 0, 0, 1, 1, 3, 2, 3, 1, 1, 0, 0, 1],
-    [0, 0, 1, 1, 1, 3, 3, 3, 1, 1, 1, 0, 0],
-    [1, 0, 0, 1, 1, 3, 2, 3, 1, 1, 0, 0, 1],
-    [1, 1, 0, 0, 1, 4, 2, 4, 1, 0, 0, 1, 1],
-    [1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1]
+let currentLevel = 1;
+const levels = [
+    [
+        [0, 0, 0, 4, 0, 0, 0, 0, 0, 4, 0, 0, 0],
+        [1, 0, 0, 4, 0, 0, 0, 0, 0, 4, 0, 0, 1],
+        [0, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 0],
+        [1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1],
+        [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+        [1, 0, 1, 1, 4, 1, 1, 1, 4, 1, 1, 0, 1],
+        [0, 0, 1, 1, 4, 1, 1, 1, 4, 1, 1, 0, 0],
+        [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+        [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+        [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+        [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+        [1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1],
+        [1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1]
+
+    ],
+    [
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+        [0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+        [0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1]
+    ]
 ];
+
 const brick = [];
 const BRICK_STATUS = {
     ACTIVE: 1,
@@ -47,21 +70,30 @@ const collisionSound = new Audio('Arkanoid SFX (1).wav');
 const deadSound = new Audio('Arkanoid SFX (11).wav');
 
 function resetGame() {
+    score = 0;
     x = canvas.width / 2;
     y = canvas.height - 30;
-    dx = 2;
+    dx = 3;
     dy = -2;
     paddleX = (canvas.width - paddleWidth) / 2;
     paddleY = canvas.height - paddleHeight - 10;
     rightPressed = false;
     leftPressed = false;
-    for (let r = 0; r < bricksLayout.length; r++) {
+
+    loadLevel();
+    $gameOverScreen.style.display = 'none';
+    draw();
+}
+
+function loadLevel() {
+    const currentBricksLayout = levels[currentLevel - 1];
+    for (let r = 0; r < currentBricksLayout.length; r++) {
         brick[r] = [];
-        for (let c = 0; c < bricksLayout[r].length; c++) {
-            if (bricksLayout[r][c] !== 0) {
+        for (let c = 0; c < currentBricksLayout[r].length; c++) {
+            if (currentBricksLayout[r][c] !== 0) {
                 const brickX = c * brickWidth + brickOffsetLeft;
                 const brickY = r * brickHeight + brickOffsetTop;
-                const color = bricksLayout[r][c];
+                const color = currentBricksLayout[r][c];
                 brick[r][c] = {
                     x: brickX,
                     y: brickY,
@@ -73,8 +105,6 @@ function resetGame() {
             }
         }
     }
-    $gameOverScreen.style.display = 'none';
-    draw();
 }
 
 let animationFrame = 0;
@@ -139,26 +169,36 @@ function collisionDetection() {
                 if (x > currentBrick.x && x < currentBrick.x + brickWidth && y + ballRadius > currentBrick.y && y - ballRadius < currentBrick.y + brickHeight) {
                     dy = -dy;
                     currentBrick.status = BRICK_STATUS.DESTROYED;
-                    playCollisionSound(); // Reproducir sonido de colisión
+                    score += 10; // Aumenta el puntaje en 10 por cada ladrillo destruido
+                    playCollisionSound();
+                    checkLevelCompletion(); // Verificar si se ha completado el nivel
                 }
                 if (y > currentBrick.y && y < currentBrick.y + brickHeight && x + ballRadius > currentBrick.x && x - ballRadius < currentBrick.x + brickWidth) {
                     dx = -dx;
                     currentBrick.status = BRICK_STATUS.DESTROYED;
-                    playCollisionSound(); // Reproducir sonido de colisión
+                    score += 10; // Aumenta el puntaje en 10 por cada ladrillo destruido
+                    playCollisionSound();
+                    checkLevelCompletion(); // Verificar si se ha completado el nivel
                 }
             }
         }
     }
 }
 
+function drawScore() {
+    ctx.font = '16px Arial';
+    ctx.fillStyle = '#fff';
+    ctx.fillText('Score: ' + score, 8, 20);
+}
+
 function ballMovement() {
     if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
         dx = -dx;
-        playCollisionSound(); // Reproducir sonido al cambiar dirección horizontal
+        playCollisionSound();
     }
     if (y + dy < ballRadius) {
         dy = -dy;
-        playCollisionSound(); // Reproducir sonido al cambiar dirección vertical
+        playCollisionSound();
     }
 
     const idBallSameAsPaddle = x > paddleX && x < paddleX + paddleWidth;
@@ -166,9 +206,8 @@ function ballMovement() {
 
     if (idBallSameAsPaddle && idBallTouchingPaddle) {
         dy = -dy;
-        playCollisionSound(); // Reproducir sonido al tocar el paddle
+        playCollisionSound();
     } else if (y + dy > canvas.height - ballRadius) {
-        // Ejecutar la animación y luego mostrar Game Over
         startPaddleAnimation().then(() => {
             gameOver();
         });
@@ -185,20 +224,20 @@ function startPaddleAnimation() {
             animationFrame = (animationFrame + 1) % animationFrames.length;
             if (animationFrame === 0) {
                 clearInterval(interval);
-                resolve(); // La animación ha terminado
+                resolve();
             }
-        }, 10); // Duración de cada frame en milisegundos
+        }, 10);
     });
 }
 
 function gameOver() {
     $gameOverScreen.style.display = 'flex';
-    deadSound.play(); // Reproducir sonido de Game Over
-    cancelAnimationFrame(animationId); // Detener el bucle de animación
+    deadSound.play();
+    cancelAnimationFrame(animationId);
 }
 
 function playCollisionSound() {
-    collisionSound.currentTime = 0; // Reiniciar el sonido
+    collisionSound.currentTime = 0;
     collisionSound.play();
 }
 
@@ -239,12 +278,35 @@ function initEvents() {
     }
 }
 
+function checkLevelCompletion() {
+    let allBricksDestroyed = true;
+    for (let r = 0; r < brick.length; r++) {
+        for (let c = 0; c < brick[r].length; c++) {
+            if (brick[r][c] && brick[r][c].status === BRICK_STATUS.ACTIVE) {
+                allBricksDestroyed = false;
+                break;
+            }
+        }
+    }
+    if (allBricksDestroyed) {
+        if (currentLevel < levels.length) {
+            currentLevel++;
+            resetGame(); // Cargar el siguiente nivel
+        } else {
+            alert('¡Ganaste!'); // Mostrar mensaje de victoria
+            currentLevel = 1; // Reiniciar al primer nivel
+            resetGame();
+        }
+    }
+}
+
 let animationId;
 function draw() {
     cleanCanvas();
     drawBall();
     drawPaddle();
     drawBricks();
+    drawScore();
     collisionDetection();
     ballMovement();
     paddleMovement();
