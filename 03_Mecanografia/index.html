@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monkey Type Clone - Test your typing skills! ⌨️</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+
+<body>
+
+
+    <body>
+        <style>
+            .Configuracion {
+                display: none;
+            }
+
+            #teclado {
+                position: absolute;
+                top: 10px;
+                right: 20px;
+                margin: 0;
+            }
+
+            #teclado svg {
+                width: 50px;
+                fill: #daaf38;
+            }
+
+            :root {
+                color-scheme: light dark;
+                --green: #00b755;
+                --yellow: #daaf38;
+                --red: #ca4754;
+                --black: #323437;
+                --gray: #999;
+            }
+
+            time {
+                color: var(--yellow)
+            }
+
+            input {
+                z-index: -999;
+                position: absolute;
+                top: 0;
+                left: 0;
+                pointer-events: none;
+                opacity: 0;
+            }
+
+            p {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 3px 8px;
+                margin: 0;
+            }
+
+            body {
+                background: var(--black);
+                font-family: Menlo, monospace;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                padding: 72px 16px 16px 16px;
+                height: 100dvh;
+                width: 100%;
+                overflow: hidden;
+                font-size: 20px;
+            }
+
+            section {
+                padding: 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                max-width: 70%;
+            }
+
+
+
+            letter {
+                color: var(--gray);
+                position: relative;
+
+                &.active::before {
+                    content: '|';
+                    color: var(--yellow);
+                    font-size: 20px;
+                    position: absolute;
+                    left: -60%;
+                    animation: 1s blink infinite ease-in-out;
+                }
+
+                &.active.is-last::before {
+                    left: 50%;
+                }
+
+                &.correct {
+                    color: var(--green);
+                }
+
+                &.incorrect {
+                    color: var(--red);
+                }
+            }
+
+            word {
+                border-bottom: 1.5px solid transparent;
+                transition: border-color 0.3s ease-in-out;
+
+                &.marked {
+                    border-color: var(--red);
+                }
+            }
+
+            @keyframes blink {
+
+                0%,
+                25% {
+                    opacity: 1;
+                }
+
+                75% {
+                    opacity: 0;
+                }
+            }
+
+            #game {
+                display: flex;
+            }
+
+            #results {
+                display: none;
+            }
+
+            h2 {
+                font-weight: 400;
+                opacity: .4;
+                margin: 0;
+                font-size: 16px;
+            }
+
+            h3 {
+                font-weight: 400;
+                margin: 0;
+                font-size: 24px;
+                color: var(--yellow);
+            }
+
+            button {
+                background: transparent;
+                border: 0;
+                margin-top: 32px;
+                padding: 8px;
+                display: inline-block;
+                transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+                cursor: pointer;
+                border-radius: 16px;
+            }
+
+            .keyTips {
+                font-size: 12px;
+                text-align: center;
+                color: #646669;
+
+                & key {
+                    background-color: #646669;
+                    color: var(--black);
+                    padding: 1px 6px;
+                    border-radius: 2px;
+                }
+            }
+
+            .left,
+            .right {
+                display: flex;
+                justify-content: start;
+                align-items: center;
+                gap: 10px;
+                color: #646669;
+
+                & button {
+                    margin: 0;
+                    padding: 0;
+                }
+            }
+
+            .leftright {
+                display: flex;
+                justify-content: space-between;
+                width: 90%;
+            }
+
+            .textButton {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 3px;
+                font-size: 12px;
+            }
+
+
+            .main_seccion {
+                display: flex;
+                justify-content: center;
+
+            }
+
+            footer {
+                height: 120px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+
+            #testConfig {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #646669;
+
+                & .row_container {
+                    width: max-content;
+                    background-color: #2c2e31;
+                    padding: 7px 10px;
+                    border-radius: 5px;
+                }
+            }
+
+            .spacer {
+                width: 4px;
+                margin: 0px 10px 0px 10px;
+                background-color: var(--black);
+                border-radius: 5px;
+            }
+
+            .active_button {
+                color: var(--yellow);
+            }
+
+
+            @media (max-width: 1000px) {
+                section {
+                    max-width: 100%;
+                }
+
+                .leftright,
+                .left {
+                    flex-wrap: wrap;
+                    gap: 15px;
+                }
+
+                .left {
+                    margin-top: 50px;
+                }
+
+                .mode,
+                .leftSpacer {
+                    display: none;
+                }
+            }
+
+            @media (max-width: 600px) {
+                #game {
+                    font-size: 15px;
+                    padding: 0;
+                }
+
+                .active::before {
+                    font-size: 15px !important;
+                }
+
+                body {
+                    justify-content: space-between;
+                }
+
+                .leftright {
+                    display: none;
+                }
+
+                footer {
+                    height: max-content;
+                }
+
+                .numbersMode {
+                    display: none;
+                }
+            }
+        </style>
+        <button onclick="activarTeclado()" id="teclado">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                style="isolation: isolate" viewBox="-680 -1030 300 180">
+                <g>
+                    <path
+                        d="M -430 -910 L -430 -910 C -424.481 -910 -420 -905.519 -420 -900 L -420 -900 C -420 -894.481 -424.481 -890 -430 -890 L -430 -890 C -435.519 -890 -440 -894.481 -440 -900 L -440 -900 C -440 -905.519 -435.519 -910 -430 -910 Z">
+                    </path>
+                    <path
+                        d=" M -570 -910 L -510 -910 C -504.481 -910 -500 -905.519 -500 -900 L -500 -900 C -500 -894.481 -504.481 -890 -510 -890 L -570 -890 C -575.519 -890 -580 -894.481 -580 -900 L -580 -900 C -580 -905.519 -575.519 -910 -570 -910 Z ">
+                    </path>
+                    <path
+                        d="M -590 -970 L -590 -970 C -584.481 -970 -580 -965.519 -580 -960 L -580 -940 C -580 -934.481 -584.481 -930 -590 -930 L -590 -930 C -595.519 -930 -600 -934.481 -600 -940 L -600 -960 C -600 -965.519 -595.519 -970 -590 -970 Z">
+                    </path>
+                    <path
+                        d=" M -639.991 -960.515 C -639.72 -976.836 -626.385 -990 -610 -990 L -610 -990 C -602.32 -990 -595.31 -987.108 -590 -982.355 C -584.69 -987.108 -577.68 -990 -570 -990 L -570 -990 C -553.615 -990 -540.28 -976.836 -540.009 -960.515 C -540.001 -960.345 -540 -960.172 -540 -960 L -540 -960 L -540 -940 C -540 -934.481 -544.481 -930 -550 -930 L -550 -930 C -555.519 -930 -560 -934.481 -560 -940 L -560 -960 L -560 -960 C -560 -965.519 -564.481 -970 -570 -970 C -575.519 -970 -580 -965.519 -580 -960 L -580 -960 L -580 -960 L -580 -940 C -580 -934.481 -584.481 -930 -590 -930 L -590 -930 C -595.519 -930 -600 -934.481 -600 -940 L -600 -960 L -600 -960 L -600 -960 L -600 -960 L -600 -960 L -600 -960 L -600 -960 L -600 -960 C -600 -965.519 -604.481 -970 -610 -970 C -615.519 -970 -620 -965.519 -620 -960 L -620 -960 L -620 -940 C -620 -934.481 -624.481 -930 -630 -930 L -630 -930 C -635.519 -930 -640 -934.481 -640 -940 L -640 -960 L -640 -960 C -640 -960.172 -639.996 -960.344 -639.991 -960.515 Z ">
+                    </path>
+                    <path
+                        d=" M -460 -930 L -460 -900 C -460 -894.481 -464.481 -890 -470 -890 L -470 -890 C -475.519 -890 -480 -894.481 -480 -900 L -480 -930 L -508.82 -930 C -514.99 -930 -520 -934.481 -520 -940 L -520 -940 C -520 -945.519 -514.99 -950 -508.82 -950 L -431.18 -950 C -425.01 -950 -420 -945.519 -420 -940 L -420 -940 C -420 -934.481 -425.01 -930 -431.18 -930 L -460 -930 Z ">
+                    </path>
+                    <path
+                        d="M -470 -990 L -430 -990 C -424.481 -990 -420 -985.519 -420 -980 L -420 -980 C -420 -974.481 -424.481 -970 -430 -970 L -470 -970 C -475.519 -970 -480 -974.481 -480 -980 L -480 -980 C -480 -985.519 -475.519 -990 -470 -990 Z">
+                    </path>
+                    <path
+                        d=" M -630 -910 L -610 -910 C -604.481 -910 -600 -905.519 -600 -900 L -600 -900 C -600 -894.481 -604.481 -890 -610 -890 L -630 -890 C -635.519 -890 -640 -894.481 -640 -900 L -640 -900 C -640 -905.519 -635.519 -910 -630 -910 Z ">
+                    </path>
+                    <path
+                        d=" M -515 -990 L -510 -990 C -504.481 -990 -500 -985.519 -500 -980 L -500 -980 C -500 -974.481 -504.481 -970 -510 -970 L -515 -970 C -520.519 -970 -525 -974.481 -525 -980 L -525 -980 C -525 -985.519 -520.519 -990 -515 -990 Z ">
+                    </path>
+                    <path
+                        d=" M -660 -910 L -680 -910 L -680 -980 C -680 -1007.596 -657.596 -1030 -630 -1030 L -430 -1030 C -402.404 -1030 -380 -1007.596 -380 -980 L -380 -900 C -380 -872.404 -402.404 -850 -430 -850 L -630 -850 C -657.596 -850 -680 -872.404 -680 -900 L -680 -920 L -660 -920 L -660 -900 C -660 -883.443 -646.557 -870 -630 -870 L -430 -870 C -413.443 -870 -400 -883.443 -400 -900 L -400 -980 C -400 -996.557 -413.443 -1010 -430 -1010 L -630 -1010 C -646.557 -1010 -660 -996.557 -660 -980 L -660 -910 Z ">
+                    </path>
+                </g>
+            </svg>
+        </button>
+        <header>
+            <div id="testConfig" class="full-width">
+                <div class="row flex row_container">
+                    <div class="puncAndNum flex gap-5">
+                        <button class="textButton punctuationMode active p-0 m-0 text-[#daaf38]">
+                            <i class="fas fa-fw fa-at"></i>
+                            punctuation
+                        </button>
+                        <button class="textButton numbersMode active p-0 m-0">
+                            <i class="fas fa-fw fa-hashtag"></i>
+                            numbers
+                        </button>
+                    </div>
+                    <div class="spacer leftSpacer"></div>
+                    <div class="mode flex gap-5">
+                        <button class="textButton p-0 m-0 text-[#daaf38]" mode="time">
+                            <i class="fas fa-fw fa-clock"></i>
+                            time
+                        </button>
+                        <button class="textButton active p-0 m-0 text-[#daaf38]" mode="words">
+                            <i class="fas fa-fw fa-font"></i>
+                            words
+                        </button>
+                        <button class="textButton p-0 m-0" mode="quote">
+                            <i class="fas fa-fw fa-quote-left"></i>
+                            quote
+                        </button>
+                        <button class="textButton p-0 m-0" mode="zen">
+                            <i class="fas fa-fw fa-mountain"></i>
+                            zen
+                        </button>
+                        <button class="textButton p-0 m-0" mode="custom">
+                            <i class="fas fa-fw fa-wrench"></i>
+                            custom
+                        </button>
+                    </div>
+                    <div class="spacer rightSpacer"></div>
+                    <div class="wordCount flex gap-5">
+                        <button class="textButton p-0 m-0" wordcount="10"><span>10</span></button>
+                        <button class="textButton p-0 m-0" wordcount="25"><span>25</span></button>
+                        <button class="textButton p-0 m-0 active_button" wordcount="50"><span>50</span></button>
+                        <button class="textButton active p-0 m-0" wordcount="100"><span>100</span></button>
+                        <button class="textButton p-0 m-0" wordcount="custom">
+                            <i class="fas fa-fw fa-tools"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="Configuracion">Configuracion</div>
+            </div>
+        </header>
+        <main class="main_seccion">
+            <section id="game">
+                <time></time>
+                <p></p>
+                <input autofocus>
+            </section>
+            <section id="results">
+                <h2>wpm</h2>
+                <h3 id="results-wpm"></h3>
+
+                <h2>accuracy</h2>
+                <h3 id="results-accuracy"></h3>
+
+                <button id="reload-button">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M19.933 13.041a8 8 0 1 1 -9.925 -8.788c3.899 -1 7.935 1.007 9.425 4.747" />
+                        <path d="M20 4v5h-5" />
+                    </svg>
+                </button>
+            </section>
+        </main>
+        <footer class="">
+            <div class="keyTips">
+                <div class="pb-[5px]" id="reload_button_restart">
+                    <key>off</key> - restart test<br>
+                </div>
+                <key>esc</key> or <key>ctrl</key> + <key>shift</key> + <key>p</key> - command line
+            </div>
+            <div class="leftright">
+                <div class="left">
+                    <button class="textButton" id="contactPopupButton">
+                        <i class="fas fa-fw fa-envelope"></i>
+                        <div class="text">contact</div>
+                    </button>
+                    <button id="supportMeButton" class="textButton">
+                        <i class="fas fa-fw fa-donate"></i>
+                        <div class="text">support</div>
+                    </button>
+                    <a href="" class="textButton" target="_blank" rel="noreferrer noopener">
+                        <i class="fas fa-fw fa-code"></i>
+                        <div class="text">github</div>
+                    </a>
+                    <a href="" class="textButton" target="_blank" rel="noreferrer noopener">
+                        <i class="fab fa-fw fa-discord"></i>
+                        <div class="text">discord</div>
+                    </a>
+                    <a href="" class="textButton" target="_blank" rel="noreferrer noopener">
+                        <i class="fab fa-fw fa-twitter"></i>
+                        <div class="text">twitter</div>
+                    </a>
+                    <a href="" class="textButton" target="_blank">
+                        <i class="fas fa-fw fa-file-contract"></i>
+                        <div class="text">terms</div>
+                    </a>
+                    <a href="" class="textButton" target="_blank">
+                        <i class="fas fa-fw fa-shield-alt"></i>
+                        <div class="text">security</div>
+                    </a>
+                    <a href="" class="textButton" target="_blank">
+                        <i class="fas fa-fw fa-lock"></i>
+                        <div class="text">privacy</div>
+                    </a>
+                </div>
+                <div class="right flex gap-3">
+                    <button class="current-theme textButton" aria-label="Shift-click to toggle custom theme"
+                        data-balloon-pos="left">
+                        <i class="fas fa-fw fa-palette"></i>
+                        <div class="text">serika dark</div>
+                    </button>
+                    <button class="currentVersion textButton">
+                        <i class="fas fa-fw fa-code-branch"></i>
+                        <div class="text">v1.10.0</div>
+                        <key id="newVersionIndicator" class="hidden">new</key>
+                    </button>
+
+                </div>
+            </div>
+        </footer>
+        <script src="../css_tailwindGlobal/script.js"></script>
+        <script>
+            document.getElementById("reload_button_restart").addEventListener("click", function() {
+                window.location.reload();
+            });
+        </script>
+        <script>
+            function activarTeclado() {
+                const input = document.querySelector('input');
+                input.focus();
+
+                setTimeout(() => {
+                    input.click();
+                }, 200);
+            }
+        </script>
+        <script type="module">
+            import { words as INITIAL_WORDS } from './data.js'
+
+            const $time = document.querySelector('time');
+            const $paragraph = document.querySelector('p');
+            const $input = document.querySelector('input');
+            const $game = document.querySelector('#game')
+            const $results = document.querySelector('#results')
+            const $wpm = $results.querySelector('#results-wpm')
+            const $accuracy = $results.querySelector('#results-accuracy')
+            const $button = document.querySelector('#reload-button')
+
+
+            const buttons = document.querySelectorAll('.wordCount .textButton');
+            const $testConfig = document.querySelector('#testConfig');
+
+
+            let INITIAL_TIME = 50;
+            let currentTime = INITIAL_TIME;
+
+            buttons.forEach(button => {
+                button.addEventListener('click', function () {
+                    buttons.forEach(btn => btn.classList.remove('active_button'));
+
+                    this.classList.add('active_button');
+
+                    let wordCountValue = this.getAttribute('wordcount');
+                    INITIAL_TIME = wordCountValue;
+                    currentTime = INITIAL_TIME;
+                    $time.textContent = currentTime
+
+
+                    console.log(INITIAL_TIME, 'INITIAL_TIME');
+                    console.log(currentTime, 'currentTime');
+                });
+            });
+
+
+
+            let words = []
+            let playing
+
+            initGame()
+            initEvents()
+
+            function initGame() {
+                $game.style.display = 'flex'
+                $results.style.display = 'none'
+                $input.value = ''
+
+                playing = false
+
+                words = INITIAL_WORDS.toSorted(
+                    () => Math.random() - 0.5
+                ).slice(0, 50)
+                currentTime = INITIAL_TIME
+
+                $time.textContent = currentTime
+
+                $paragraph.innerHTML = words.map((word, index) => {
+                    const letters = word.split('')
+
+                    return `<word>
+            ${letters
+                            .map(letter => `<letter>${letter}</letter>`)
+                            .join('')
+                        }
+            </word>`
+                }).join('')
+
+                const $firstWord = $paragraph.querySelector('word')
+                $firstWord.classList.add('active')
+                $firstWord.querySelector('letter').classList.add('active')
+            }
+
+            function initEvents() {
+                document.addEventListener('keydown', () => {
+                    $input.focus()
+                    if (!playing) {
+                        playing = true
+                        const intervalId = setInterval(() => {
+                            currentTime--
+                            $time.textContent = currentTime
+
+                            if (currentTime === 0) {
+                                clearInterval(intervalId)
+                                gameOver()
+                            }
+                        }, 1000)
+                    }
+                })
+                $input.addEventListener('keydown', onKeyDown)
+                $input.addEventListener('keyup', onKeyUp)
+
+                $button.addEventListener('click', initGame)
+
+
+            }
+
+            function onKeyDown(event) {
+                const $currentWord = $paragraph.querySelector('word.active')
+                const $currentLetter = $currentWord.querySelector('letter.active')
+
+                const { key } = event
+                if (key === ' ') {
+                    event.preventDefault()
+
+                    const $nextWord = $currentWord.nextElementSibling
+                    const $nextLetter = $nextWord.querySelector('letter')
+
+                    $currentWord.classList.remove('active', 'marked')
+                    $currentLetter.classList.remove('active')
+
+                    $nextWord.classList.add('active')
+                    $nextLetter.classList.add('active')
+
+                    $input.value = ''
+
+                    const hasMissedLetters = $currentWord
+                        .querySelectorAll('letter:not(.correct)').length > 0
+
+                    const classToAdd = hasMissedLetters ? 'marked' : 'correct'
+                    $currentWord.classList.add(classToAdd)
+
+                    return
+                }
+
+                if (key === 'Backspace') {
+                    const $prevWord = $currentWord.previousElementSibling
+                    const $prevLetter = $currentLetter.previousElementSibling
+
+                    if (!$prevWord && !$prevLetter) {
+                        event.preventDefault()
+                        return
+                    }
+
+                    const $wordMarked = $paragraph.querySelector('word.marked')
+                    if ($wordMarked && !$prevLetter) {
+                        event.preventDefault()
+                        $prevWord.classList.remove('marked')
+                        $prevWord.classList.add('active')
+
+                        const $letterToGo = $prevWord.querySelector('letter:last-child')
+
+                        $currentLetter.classList.remove('active')
+                        $letterToGo.classList.add('active')
+
+                        $input.value = [
+                            ...$prevWord.querySelectorAll('letter.correct, letter.incorrect')
+                        ].map($el => {
+                            return $el.classList.contains('correct') ? $el.innerText : '*'
+                        })
+                            .join('')
+                    }
+                }
+            }
+
+            function onKeyUp() {
+                $testConfig.style.display = 'none';
+
+                // recuperamos los elementos actuals
+                const $currentWord = $paragraph.querySelector('word.active')
+                const $currentLetter = $currentWord.querySelector('letter.active')
+
+                const currentWord = $currentWord.innerText.trim()
+                $input.maxLength = currentWord.length
+
+                const $allLetters = $currentWord.querySelectorAll('letter')
+
+                $allLetters.forEach($letter => $letter.classList.remove('correct', 'incorrect'))
+
+                $input.value.split('').forEach((char, index) => {
+                    const $letter = $allLetters[index]
+                    const letterToCheck = currentWord[index]
+
+                    const isCorrect = char === letterToCheck
+                    const letterClass = isCorrect ? 'correct' : 'incorrect'
+                    $letter.classList.add(letterClass)
+                })
+
+                $currentLetter.classList.remove('active', 'is-last')
+                const inputLength = $input.value.length
+                const $nextActiveLetter = $allLetters[inputLength]
+
+                if ($nextActiveLetter) {
+                    $nextActiveLetter.classList.add('active')
+                } else {
+                    $currentLetter.classList.add('active', 'is-last')
+                    // TODO: gameover si no hay próxima palabra
+                }
+            }
+
+
+
+
+
+
+            function gameOver() {
+                $testConfig.style.display = '';
+
+                $game.style.display = 'none'
+                $results.style.display = 'flex'
+
+                const correctWords = $paragraph.querySelectorAll('word.correct').length
+                const correctLetter = $paragraph.querySelectorAll('letter.correct').length
+                const incorrectLetter = $paragraph.querySelectorAll('letter.incorrect').length
+
+                const totalLetters = correctLetter + incorrectLetter
+
+                const accuracy = totalLetters > 0
+                    ? (correctLetter / totalLetters) * 100
+                    : 0
+
+                const wpm = correctWords * 60 / INITIAL_TIME
+                $wpm.textContent = wpm
+                $accuracy.textContent = `${accuracy.toFixed(2)}%`
+            }
+        </script>
+
+    </body>
+
+</html>
